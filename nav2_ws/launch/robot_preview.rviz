@@ -1,0 +1,35 @@
+VisualizationManager:
+  Class: ""
+  Displays:
+    - Class: rviz/RobotModel
+      Description Topic: /robot_description
+      Enabled: true
+      Name: RobotModel
+    - Class: rviz/TF
+      Enabled: true
+      Name: TF
+    - Class: rviz/JointState
+      Enabled: true
+      Name: JointState
+    - Class: rviz/Grid
+      Enabled: true
+      Name: Grid
+  Enabled: true
+  Global Options:
+    Background Color: 48 48 48
+    Fixed Frame: base_footprint
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+  Value: true
+  Views:
+    - Class: rviz/Orbit
+      Name: Current View
+      Value: Orbit (rviz)
+      Distance: 1.0
+      Focal Point: [0, 0, 0]
+      Pitch: -1.57
+      Yaw: 0
