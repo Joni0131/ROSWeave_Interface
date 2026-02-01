@@ -47,7 +47,8 @@ RUN apt install -y --no-install-recommends --no-install-suggests --allow-unauthe
     ros-${ROS_DISTRO}-navigation2 \
     ros-${ROS_DISTRO}-turtlebot3-gazebo \
     ros-${ROS_DISTRO}-xacro \
-    ros-${ROS_DISTRO}-joint-state-publisher-gui
+    ros-${ROS_DISTRO}-joint-state-publisher-gui \
+    ros-${ROS_DISTRO}-sdformat-urdf
 
 # Add microros
 RUN git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_msgs ./src/micro_ros_msgs

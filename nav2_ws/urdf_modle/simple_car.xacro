@@ -10,53 +10,60 @@
 
     <!--
         Defaults adjusted to match your technical specs (units: meters)
-        Provided specs (converted): length=392mm -> 0.392 m, width=165mm -> 0.165 m, wheelbase=260mm -> 0.26 m, ground_clearance=30mm -> 0.03 m
+        Provided specs (converted): length=392mm -> 0.392 m, width=165mm -> 0.165 m, wheelbase=260mm ->
+    0.26 m, ground_clearance=30mm -> 0.03 m
     -->
-    <xacro:macro name="four_wheel_car" params="prefix='' base_length=0.392 base_width=0.165 base_height=0.05 wheel_radius=0.03 wheel_width=0.02 track_width=0.145 wheelbase=0.26 ground_clearance=0.03 chassis_mass=2.0 wheel_mass=0.2 max_steer=0.65 color='Blue'">
+    <xacro:macro name="four_wheel_car"
+        params="prefix='' base_length=0.392 base_width=0.165 base_height=0.05 wheel_radius=0.03 wheel_width=0.02 track_width=0.145 wheelbase=0.26 ground_clearance=0.03 chassis_mass=2.0 wheel_mass=0.2 max_steer=0.65 color='Blue'">
 
         <!-- computed positions -->
-        <xacro:property name="x_front" value="${wheelbase/2}"/>
-        <xacro:property name="x_rear" value="${-wheelbase/2}"/>
-        <xacro:property name="y_left" value="${track_width/2}"/>
-        <xacro:property name="y_right" value="${-track_width/2}"/>
+        <xacro:property name="x_front" value="${wheelbase/2}" />
+        <xacro:property name="x_rear" value="${-wheelbase/2}" />
+        <xacro:property name="y_left" value="${track_width/2}" />
+        <xacro:property name="y_right" value="${-track_width/2}" />
         <!-- z_wheel chosen so the chassis bottom sits `ground_clearance` above wheel bottoms -->
-        <xacro:property name="z_wheel" value="${-base_height/2 + wheel_radius - ground_clearance}"/>
+        <xacro:property name="z_wheel" value="${-base_height/2 + wheel_radius - ground_clearance}" />
 
         <!-- base/chassis -->
         <link name="${prefix}base_link">
             <visual>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <box size="${base_length} ${base_width} ${base_height}"/>
+                    <box size="${base_length} ${base_width} ${base_height}" />
                 </geometry>
                 <material name="${color}">
-                    <color rgba="0.3 0.3 0.8 1.0"/>
+                    <color rgba="0.3 0.3 0.8 1.0" />
                 </material>
             </visual>
             <collision>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <box size="${base_length} ${base_width} ${base_height}"/>
+                    <box size="${base_length} ${base_width} ${base_height}" />
                 </geometry>
             </collision>
             <inertial>
                 <!-- approximate box inertia -->
-                <mass value="${chassis_mass}"/>
-                <origin xyz="0 0 0"/>
-                <inertia ixx="${(1.0/12.0)*chassis_mass*(base_height*base_height + base_width*base_width)}" ixy="0.0" ixz="0.0" iyy="${(1.0/12.0)*chassis_mass*(base_length*base_length + base_height*base_height)}" iyz="0.0" izz="${(1.0/12.0)*chassis_mass*(base_length*base_length + base_width*base_width)}"/>
+                <mass value="${chassis_mass}" />
+                <origin xyz="0 0 0" />
+                <inertia
+                    ixx="${(1.0/12.0)*chassis_mass*(base_height*base_height + base_width*base_width)}"
+                    ixy="0.0" ixz="0.0"
+                    iyy="${(1.0/12.0)*chassis_mass*(base_length*base_length + base_height*base_height)}"
+                    iyz="0.0"
+                    izz="${(1.0/12.0)*chassis_mass*(base_length*base_length + base_width*base_width)}" />
             </inertial>
         </link>
 
         <!-- Virtual footprint link: used by navigation stacks to represent the robot's
                footprint projected onto the ground plane. No visual or collision. -->
-        <link name="${prefix}base_footprint"/>
+        <link name="${prefix}base_footprint" />
 
         <!-- Fixed joint from chassis center to footprint at ground level. We place the
                footprint at the wheel bottom (ground) computed as -base_height/2 - ground_clearance -->
         <joint name="${prefix}base_footprint_joint" type="fixed">
-            <parent link="${prefix}base_link"/>
-            <child link="${prefix}base_footprint"/>
-            <origin xyz="0 0 ${-base_height/2 - ground_clearance}" rpy="0 0 0"/>
+            <parent link="${prefix}base_link" />
+            <child link="${prefix}base_footprint" />
+            <origin xyz="0 0 ${-base_height/2 - ground_clearance}" rpy="0 0 0" />
         </joint>
 
         <!-- helper macro to add a wheel (visual + collision + inertial) -->
@@ -64,88 +71,104 @@
             <link name="${name}">
                 <visual>
                     <!-- rotate cylinder so axis aligns with wheel rotation axis (y) -->
-                    <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+                    <origin xyz="0 0 0" rpy="1.5708 0 0" />
                     <geometry>
-                        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                        <cylinder radius="${wheel_radius}" length="${wheel_width}" />
                     </geometry>
                     <material name="Black">
-                        <color rgba="0.05 0.05 0.05 1.0"/>
+                        <color rgba="0.05 0.05 0.05 1.0" />
                     </material>
                 </visual>
                 <collision>
-                    <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+                    <origin xyz="0 0 0" rpy="1.5708 0 0" />
                     <geometry>
-                        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                        <cylinder radius="${wheel_radius}" length="${wheel_width}" />
                     </geometry>
                 </collision>
                 <inertial>
-                    <mass value="${wheel_mass}"/>
-                    <origin xyz="0 0 0"/>
+                    <mass value="${wheel_mass}" />
+                    <origin xyz="0 0 0" />
                     <!-- rough cylinder inertia -->
-                    <inertia ixx="${0.5*wheel_mass*wheel_radius*wheel_radius}" ixy="0.0" ixz="0.0" iyy="${(1.0/12.0)*wheel_mass*(3*wheel_radius*wheel_radius + wheel_width*wheel_width)}" iyz="0.0" izz="${(1.0/12.0)*wheel_mass*(3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"/>
+                    <inertia ixx="${0.5*wheel_mass*wheel_radius*wheel_radius}" ixy="0.0" ixz="0.0"
+                        iyy="${(1.0/12.0)*wheel_mass*(3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+                        iyz="0.0"
+                        izz="${(1.0/12.0)*wheel_mass*(3*wheel_radius*wheel_radius + wheel_width*wheel_width)}" />
                 </inertial>
             </link>
         </xacro:macro>
 
         <!-- FRONT LEFT wheel + steering -->
-        <link name="${prefix}front_left_steer_link"/>
+        <link name="${prefix}front_left_steer_link">
+            <inertial>
+                <mass value="0.01" />
+                <origin xyz="0 0 0" />
+                <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+            </inertial>
+        </link>
         <joint name="${prefix}front_left_steer_joint" type="revolute">
-            <parent link="${prefix}base_link"/>
-            <child link="${prefix}front_left_steer_link"/>
-            <origin xyz="${x_front} ${y_left} ${z_wheel}" rpy="0 0 0"/>
-            <axis xyz="0 0 1"/>
-            <limit lower="${-max_steer}" upper="${max_steer}" effort="10.0" velocity="1.0"/>
+            <parent link="${prefix}base_link" />
+            <child link="${prefix}front_left_steer_link" />
+            <origin xyz="${x_front} ${y_left} ${z_wheel}" rpy="0 0 0" />
+            <axis xyz="0 0 1" />
+            <limit lower="${-max_steer}" upper="${max_steer}" effort="10.0" velocity="1.0" />
         </joint>
 
-        <xacro:wheel_link name="${prefix}front_left_wheel_link"/>
+        <xacro:wheel_link name="${prefix}front_left_wheel_link" />
         <joint name="${prefix}front_left_wheel_joint" type="continuous">
-            <parent link="${prefix}front_left_steer_link"/>
-            <child link="${prefix}front_left_wheel_link"/>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <parent link="${prefix}front_left_steer_link" />
+            <child link="${prefix}front_left_wheel_link" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
             <!-- wheel rotation axis (y) -->
-            <axis xyz="0 1 0"/>
+            <axis xyz="0 1 0" />
         </joint>
 
         <!-- FRONT RIGHT wheel + steering -->
-        <link name="${prefix}front_right_steer_link"/>
+        <link name="${prefix}front_right_steer_link">
+            <inertial>
+                <mass value="0.01" />
+                <origin xyz="0 0 0" />
+                <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+            </inertial>
+        </link>
         <joint name="${prefix}front_right_steer_joint" type="revolute">
-            <parent link="${prefix}base_link"/>
-            <child link="${prefix}front_right_steer_link"/>
-            <origin xyz="${x_front} ${y_right} ${z_wheel}" rpy="0 0 0"/>
-            <axis xyz="0 0 1"/>
-            <limit lower="${-max_steer}" upper="${max_steer}" effort="10.0" velocity="1.0"/>
+            <parent link="${prefix}base_link" />
+            <child link="${prefix}front_right_steer_link" />
+            <origin xyz="${x_front} ${y_right} ${z_wheel}" rpy="0 0 0" />
+            <axis xyz="0 0 1" />
+            <limit lower="${-max_steer}" upper="${max_steer}" effort="10.0" velocity="1.0" />
         </joint>
 
-        <xacro:wheel_link name="${prefix}front_right_wheel_link"/>
+        <xacro:wheel_link name="${prefix}front_right_wheel_link" />
         <joint name="${prefix}front_right_wheel_joint" type="continuous">
-            <parent link="${prefix}front_right_steer_link"/>
-            <child link="${prefix}front_right_wheel_link"/>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-            <axis xyz="0 1 0"/>
+            <parent link="${prefix}front_right_steer_link" />
+            <child link="${prefix}front_right_wheel_link" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <axis xyz="0 1 0" />
         </joint>
 
         <!-- REAR LEFT wheel (driven) -->
-        <xacro:wheel_link name="${prefix}rear_left_wheel_link"/>
+        <xacro:wheel_link name="${prefix}rear_left_wheel_link" />
         <joint name="${prefix}rear_left_wheel_joint" type="continuous">
-            <parent link="${prefix}base_link"/>
-            <child link="${prefix}rear_left_wheel_link"/>
-            <origin xyz="${x_rear} ${y_left} ${z_wheel}" rpy="0 0 0"/>
-            <axis xyz="0 1 0"/>
+            <parent link="${prefix}base_link" />
+            <child link="${prefix}rear_left_wheel_link" />
+            <origin xyz="${x_rear} ${y_left} ${z_wheel}" rpy="0 0 0" />
+            <axis xyz="0 1 0" />
         </joint>
 
         <!-- REAR RIGHT wheel (driven) -->
-        <xacro:wheel_link name="${prefix}rear_right_wheel_link"/>
+        <xacro:wheel_link name="${prefix}rear_right_wheel_link" />
         <joint name="${prefix}rear_right_wheel_joint" type="continuous">
-            <parent link="${prefix}base_link"/>
-            <child link="${prefix}rear_right_wheel_link"/>
-            <origin xyz="${x_rear} ${y_right} ${z_wheel}" rpy="0 0 0"/>
-            <axis xyz="0 1 0"/>
+            <parent link="${prefix}base_link" />
+            <child link="${prefix}rear_right_wheel_link" />
+            <origin xyz="${x_rear} ${y_right} ${z_wheel}" rpy="0 0 0" />
+            <axis xyz="0 1 0" />
         </joint>
 
-        <!-- Note: do not attach to an undefined 'world' link (some previewers require base_link to be the root). -->
+        <!-- Note: do not attach to an undefined 'world' link (some previewers require base_link to
+        be the root). -->
 
     </xacro:macro>
 
     <!-- Default instantiation -->
-    <xacro:four_wheel_car/>
+    <xacro:four_wheel_car />
 </robot>
