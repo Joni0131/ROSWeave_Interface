@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<sdf version="1.8" xmlns:xacro="http://ros.org/wiki/xacro">
+    <model name='simple_pickup' canonical_link='base_link'>
+
+        <!-- Define robot constants -->
+        <xacro:property name="base_width" value="0.31" />
+        <xacro:property name="base_length" value="0.42" />
+        <xacro:property name="base_height" value="0.18" />
+
+        <xacro:property name="wheel_radius" value="0.10" />
+        <xacro:property name="wheel_width" value="0.04" />
+        <xacro:property name="wheel_ygap" value="0.025" />
+        <xacro:property name="wheel_zoff" value="0.05" />
+        <xacro:property name="wheel_xoff" value="0.12" />
+
+        <xacro:property name="caster_xoff" value="0.14" />
+
+        <!-- Define some commonly used inertial properties  -->
+        <xacro:macro name="box_inertia" params="m w h d">
+            <inertial>
+                <pose>0 0 0 ${pi/2} 0 ${pi/2}</pose>
+                <mass>${m}</mass>
+                <inertia>
+                    <ixx>${(m/12) * (h*h + d*d)}</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>${(m/12) * (w*w + d*d)}</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>${(m/12) * (w*w + h*h)}</izz>
+                </inertia>
+            </inertial>
+        </xacro:macro>
+
+        <xacro:macro name="cylinder_inertia" params="m r h">
+            <inertial>
+                <pose>0 0 0 ${pi/2} 0 0</pose>
+                <mass>${m}</mass>
+                <inertia>
+                    <ixx>${(m/12) * (3*r*r + h*h)}</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>${(m/12) * (3*r*r + h*h)}</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>${(m/2) * (r*r)}</izz>
+                </inertia>
+            </inertial>
+        </xacro:macro>
+
+
+        <xacro:macro name="sphere_inertia" params="m r">
+            <inertial>
+                <mass>${m}</mass>
+                <inertia>
+                    <ixx>${(2/5) * m * (r*r)}</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>${(2/5) * m * (r*r)}</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>${(2/5) * m * (r*r)}</izz>
+                </inertia>
+            </inertial>
+        </xacro:macro>
+
+        <!-- Wheels back-->
+        <xacro:macro name="wheel_back" params="prefix x_reflect y_reflect">
+            <link name="${prefix}_link">
+                <pose relative_to="${prefix}_joint" />
+
+                <visual name="${prefix}_link_visual">
+                    <pose relative_to="${prefix}_link">0 0 0 ${pi/2} 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>${wheel_radius}</radius>
+                            <length>${wheel_width}</length>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0.3 0.3 0.3 1.0</ambient>
+                        <diffuse>0.7 0.7 0.7 1.0</diffuse>
+                    </material>
+                </visual>
+
+                <collision name="${prefix}_link_collision">
+                    <pose relative_to="${prefix}_link">0 0 0 ${pi/2} 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>${wheel_radius}</radius>
+                            <length>${wheel_width}</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+
+                <xacro:cylinder_inertia m="0.5" r="${wheel_radius}" h="${wheel_width}" />
+            </link>
+
+            <joint name="${prefix}_joint" type="continuous">
+                <parent>base_link</parent>
+                <child>${prefix}_link</child>
+                <pose relative_to="base_link">${x_reflect*wheel_xoff}
+                    ${y_reflect*(base_width/2+wheel_ygap)} ${-wheel_zoff} 0 0 0</pose>
+                <axis>
+                    <xyz>0 1 0</xyz>
+                </axis>
+            </joint>
+        </xacro:macro>
+
+        <!-- Wheel front steering-->
+        <xacro:macro name="wheel_front" params="prefix x_reflect y_reflect">
+            <link name="${prefix}_link">
+                <pose relative_to="${prefix}_joint" />
+                <visual name="${prefix}_link_visual">
+                    <pose relative_to="${prefix}_link">0 0 0 ${pi/2} 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>${wheel_radius}</radius>
+                            <length>${wheel_width}</length>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>0.3 0.3 0.3 1.0</ambient>
+                        <diffuse>0.7 0.7 0.7 1.0</diffuse>
+                    </material>
+                </visual>
+                <collision name="${prefix}_link_collision">
+                    <pose relative_to="${prefix}_link">0 0 0 ${pi/2} 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>${wheel_radius}</radius>
+                            <length>${wheel_width}</length>
+                        </cylinder>
+                    </geometry>
+                </collision>
+                <xacro:cylinder_inertia m="0.5" r="${wheel_radius}" h="${wheel_width}" />
+            </link>
+            <joint name="${prefix}_joint" type="revolute">
+                <parent>base_link</parent>
+                <child>${prefix}_link</child>
+                <pose relative_to="base_link">${x_reflect*wheel_xoff}
+                    ${y_reflect*(base_width/2+wheel_ygap)} ${-wheel_zoff} 0 0 0</pose>
+                <axis>
+                    <xyz>0 0 1</xyz>
+                    <limit>
+                        <lower>-0.65</lower>
+                        <upper>0.65</upper>
+                    </limit>
+                </axis>
+            </joint>
+        </xacro:macro>
+
+        <xacro:macro name="four_wheel_car"
+            params="prefix='' base_length=0.392 base_width=0.165 base_height=0.05 wheel_radius=0.03 wheel_width=0.02 track_width=0.145 wheelbase=0.26 ground_clearance=0.03 chassis_mass=2.0 wheel_mass=0.2 max_steer=0.65 color='Blue'">
+
+            <!-- computed positions -->
+            <xacro:property name="x_front" value="${wheelbase/2}" />
+            <xacro:property name="x_rear" value="${-wheelbase/2}" />
+            <xacro:property name="y_left" value="${track_width/2}" />
+            <xacro:property name="y_right" value="${-track_width/2}" />
+            <!-- z_wheel chosen so the chassis bottom sits `ground_clearance` above wheel bottoms -->
+            <xacro:property name="z_wheel"
+                value="${-base_height/2 + wheel_radius - ground_clearance}" />
+
+            <!-- base/chassis -->
+            <link name="${prefix}base_link">
+                <visual name="${prefix}base_link_visual">
+                    <geometry>
+                        <box>
+                            <size>${base_length} ${base_width} ${base_height}</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>0.3 0.3 0.8 1.0</ambient>
+                        <diffuse>0.3 0.3 0.8 1.0</diffuse>
+                    </material>
+                </visual>
+                <collision name="${prefix}base_link_collision">
+                    <geometry>
+                        <box>
+                            <size>${base_length} ${base_width} ${base_height}</size>
+                        </box>
+                    </geometry>
+                </collision>
+            </link>
+
+            <!-- Virtual footprint link: used by navigation stacks to represent the robot's
+               footprint projected onto the ground plane. No visual or collision. -->
+            <link name="${prefix}base_footprint">
+                <pose relative_to="${prefix}base_footprint_joint" />
+                <xacro:box_inertia m="15" w="${base_width}" d="${base_length}" h="${base_height}" />
+            </link>
+
+            <!-- Fixed joint from chassis center to footprint at ground level. We place the
+               footprint at the wheel bottom (ground) computed as -base_height/2 - ground_clearance -->
+            <joint name="${prefix}base_footprint_joint" type="fixed">
+                <parent>${prefix}base_link</parent>
+                <child>${prefix}base_footprint</child>
+                <pose relative_to="${prefix}base_link">0 0 ${-base_height/2 - ground_clearance} 0 0
+                    0</pose>
+            </joint>
+
+            <xacro:wheel_back prefix="drivewhl_l" x_reflect="-1" y_reflect="1" />
+            <xacro:wheel_back prefix="drivewhl_r" x_reflect="-1" y_reflect="-1" />
+
+            <xacro:wheel_front prefix="front_left_wheel" x_reflect="1" y_reflect="1" />
+            <xacro:wheel_front prefix="front_right_wheel" x_reflect="1" y_reflect="-1" />
+
+
+        </xacro:macro>
+
+        <!-- Default instantiation -->
+        <xacro:four_wheel_car />
+
+    </model>
+</sdf>

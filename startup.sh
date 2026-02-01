@@ -115,8 +115,6 @@ mystartupcommand_sdf="source /opt/ros/jazzy/setup.bash && source /root/uros_ws/i
     python3 -m venv /root/nav2_ws/venv && \
     source /root/nav2_ws/venv/bin/activate && \
     pip install -r /root/nav2_ws/requirements.txt && \
-    xacro /root/nav2_ws/urdf_modle/simple_car.xacro > /root/nav2_ws/urdf_modle/simple_car.urdf && \
-    gz sdf -p /root/nav2_ws/urdf_modle/simple_car.urdf > /root/nav2_ws/urdf_modle/simple_car.sdf && \
     python3 /root/nav2_ws/launch/preview_launch.py --file_format sdf"
 
 podman exec -it "$container_name" bash -c "$mystartupcommand_sdf"
